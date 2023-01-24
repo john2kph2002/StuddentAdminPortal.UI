@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
+import { Gender } from 'src/app/models/ui-models/gender.models';
+import { GenderService } from 'src/app/services/gender.service';
 import { Student } from '../../models/ui-models/student.models';
 import { StudentService } from '../student.service';
 
@@ -30,8 +33,12 @@ export class ViewStudentComponent implements OnInit {
     }
   }
 
+  genderList: Gender[] = [];
+
   constructor(private readonly studentService: StudentService,
-    private readonly route: ActivatedRoute){ }
+    private readonly route: ActivatedRoute,
+    private readonly genderService: GenderService,
+    private snackbar: MatSnackBar){ }
 
 
   ngOnInit(): void {
@@ -47,8 +54,32 @@ export class ViewStudentComponent implements OnInit {
               //console.log(successResponse);
             }
           );
+
+          this.genderService.getGenderList()
+          .subscribe(
+            (successResponse) =>{
+              this.genderList = successResponse;
+            }
+          );
         }
       }
     );
+  }
+
+  onUpdate(): void{
+    //console.log(this.student);
+    this.studentService.updateStudent(this.student.id, this.student)
+    .subscribe(
+      (successResponse) => {
+        //Show notification
+        this.snackbar.open('Student updated successfuly', undefined, {
+          duration:2000
+        });
+
+      },
+      (errorResponse) =>{
+        // Log it
+      }
+    )
   }
 }
